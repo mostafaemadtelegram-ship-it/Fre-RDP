@@ -5,6 +5,7 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: Setting Up
+      continue-on-error: true
       run: |
         Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
         Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
@@ -18,6 +19,8 @@ jobs:
         Start-Process ./ngrok/ngrok.exe -ArgumentList "tcp 3389"
     - name: Ready!
       run: |
+        $ErrorActionPreference = 'SilentlyContinue'
+        Start-Sleep -Seconds 10
         $response = Invoke-RestMethod -Uri http://localhost:4040/api/tunnels
         Write-Host "URL: $($response.tunnels.public_url)"
         Write-Host "User: runneradmin"
